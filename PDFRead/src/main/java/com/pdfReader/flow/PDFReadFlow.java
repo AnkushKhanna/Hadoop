@@ -2,6 +2,8 @@ package com.pdfReader.flow;
 
 import java.util.Properties;
 
+import com.pdfReader.function.ConvertAllPdfToTextFile;
+
 import cascading.flow.Flow;
 import cascading.flow.FlowConnector;
 import cascading.flow.hadoop.HadoopFlowConnector;
@@ -15,8 +17,10 @@ import cascading.pipe.Pipe;
 import cascading.property.AppProps;
 import cascading.scheme.Scheme;
 import cascading.scheme.hadoop.TextDelimited;
+import cascading.scheme.hadoop.TextLine;
 import cascading.tap.SinkMode;
 import cascading.tap.Tap;
+import cascading.tap.hadoop.GlobHfs;
 import cascading.tap.hadoop.Hfs;
 import cascading.tuple.Fields;
 
@@ -28,11 +32,11 @@ public class PDFReadFlow {
 	 * */
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static Flow getPDFReadFlow(String input, String output, String regex){
+	public static Flow getPDFReadFlow(String input, String output, String folder, String regex){
 		//Input Tap
-		Fields sourceField = new Fields("Name","Text");
-		Scheme sourceScheme = new TextDelimited(sourceField,",");
-		Tap source = new Hfs(sourceScheme, input);
+		Fields sourceField = new Fields("fileName");
+		Scheme sourceScheme = new TextLine(sourceField);
+		Tap source = new GlobHfs(sourceScheme, input);
 		
 		//Output Tap
 		Fields sinkField = new Fields("Name","Count");
@@ -42,6 +46,8 @@ public class PDFReadFlow {
 		//Pipe
 		Pipe assembly = new Pipe("Word Match");
 		//Match Into words
+		Fields fields = new Fields("Name","Text");
+		assembly = new Each(assembly, new ConvertAllPdfToTextFile(fields,folder));
 		
 		Function function = new RegexGenerator(new Fields("Words"), regex);
 		assembly = new Each(assembly, new Fields("Text"), function, new Fields("Name","Words"));
@@ -49,6 +55,7 @@ public class PDFReadFlow {
 		//GroupBy words
 		assembly = new GroupBy(assembly, new Fields("Name"));
 		//Count
+	
 		assembly = new Every(assembly, new Count(new Fields("Count")));
 		//Flow
 		Properties properties = new Properties();

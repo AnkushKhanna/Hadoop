@@ -11,6 +11,19 @@
 		</repository>
 	</repositories>
 	<dependencies>
+	
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox-core</artifactId>
+			<version>1.7.1</version>
+			<scope>system</scope>
+			<systemPath>/home/ankush/workspace2/PDFRead/lib/pdfbox-1.7.1.jar</systemPath>
+		</dependency>
+		 <dependency>
+	      <groupId>org.apache.pdfbox</groupId>
+	      <artifactId>fontbox</artifactId>
+	      <version>1.7.1</version>
+    	</dependency>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-core</artifactId>
@@ -52,7 +65,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-<!-- 							<mainClass>de.fhg.iais.kd.hadoop.examples.WordCount</mainClass> -->
+					<mainClass>com.pdfReader.Start</mainClass> 
 						</manifest>
 					</archive>
 					<descriptorRefs>
